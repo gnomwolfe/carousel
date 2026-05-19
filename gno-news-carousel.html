@@ -6,11 +6,12 @@
 <title>GNO Updates</title>
 <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Bebas+Neue%7CMontserrat:400,700" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { font-family: 'Montserrat', sans-serif; background: transparent; overflow-x: hidden; overflow-y: hidden; }
   #gno-wrapper { padding: 0 0 1rem; }
+  h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.75rem; font-weight: 400; letter-spacing: normal; color: #f26523; text-transform: uppercase; margin: 0 0 1rem; line-height: 1; }
   #gno-carousel { outline: none; }
   #gno-carousel .flickity-viewport { overflow: visible; }
   .gno-card { width: 280px; margin-right: 18px; background: #fff; border: 1px solid #e5e5e5; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; text-decoration: none; transition: box-shadow 0.2s ease, transform 0.2s ease; }
@@ -18,17 +19,18 @@
   .gno-card-img { width: 100%; height: 155px; object-fit: cover; display: block; }
   .gno-card-placeholder { width: 100%; height: 155px; background: linear-gradient(135deg, #1b3a6b, #2a5298); display: flex; align-items: center; justify-content: center; }
   .gno-card-body { padding: 0.85rem 1rem 1rem; display: flex; flex-direction: column; flex: 1; }
-  .gno-card-cat { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #e85d26; margin-bottom: 0.35rem; }
+  .gno-card-cat { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #f26523; margin-bottom: 0.35rem; }
   .gno-card-title { font-size: 0.85rem; font-weight: 700; color: #1b3a6b; line-height: 1.35; margin-bottom: 0.5rem; }
   .gno-card-date { font-size: 0.68rem; color: #999; margin-top: auto; padding-top: 0.6rem; border-top: 1px solid #f0f0f0; }
   #gno-nav { display: none; align-items: center; gap: 0.75rem; margin-top: 0.85rem; font-size: 0.8rem; color: #666; }
   #gno-nav button { background: #1b3a6b; border: none; color: #fff; width: 32px; height: 32px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-  #gno-nav button:hover { background: #e85d26; }
+  #gno-nav button:hover { background: #f26523; }
   #gno-loading { font-size: 0.85rem; color: #999; padding: 0.5rem 0; }
 </style>
 </head>
 <body>
 <div id="gno-wrapper">
+  <h2>GNO Updates</h2>
   <div id="gno-carousel"><p id="gno-loading">Loading updates...</p></div>
   <div id="gno-nav">
     <button id="gno-prev" aria-label="Previous">&#8592;</button>
