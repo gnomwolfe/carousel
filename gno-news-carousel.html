@@ -11,10 +11,43 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { font-family: 'Montserrat', sans-serif; background: transparent; overflow-x: hidden; overflow-y: hidden; }
   #gno-wrapper { padding: 0 0 1rem; }
-  h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.75rem; font-weight: 400; letter-spacing: normal; color: #f26523; text-transform: uppercase; margin: 0 0 1rem; line-height: 1; }
+
+  h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 400;
+    letter-spacing: normal;
+    color: #f26523;
+    text-transform: uppercase;
+    margin: 0 0 1rem;
+    line-height: 1;
+  }
+
   #gno-carousel { outline: none; }
   #gno-carousel .flickity-viewport { overflow: visible; }
-  .gno-card { width: 280px; margin-right: 18px; background: #fff; border: 1px solid #e5e5e5; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; text-decoration: none; transition: box-shadow 0.2s ease, transform 0.2s ease; }
+
+  /* Desktop: fixed width cards */
+  .gno-card {
+    width: 280px;
+    margin-right: 18px;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  /* Mobile: full width cards */
+  @media (max-width: 600px) {
+    .gno-card {
+      width: 85vw;
+      margin-right: 12px;
+    }
+  }
+
   .gno-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.12); transform: translateY(-2px); }
   .gno-card-img { width: 100%; height: 155px; object-fit: cover; display: block; }
   .gno-card-placeholder { width: 100%; height: 155px; background: linear-gradient(135deg, #1b3a6b, #2a5298); display: flex; align-items: center; justify-content: center; }
@@ -22,6 +55,7 @@
   .gno-card-cat { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #f26523; margin-bottom: 0.35rem; }
   .gno-card-title { font-size: 0.85rem; font-weight: 700; color: #1b3a6b; line-height: 1.35; margin-bottom: 0.5rem; }
   .gno-card-date { font-size: 0.68rem; color: #999; margin-top: auto; padding-top: 0.6rem; border-top: 1px solid #f0f0f0; }
+
   #gno-nav { display: none; align-items: center; gap: 0.75rem; margin-top: 0.85rem; font-size: 0.8rem; color: #666; }
   #gno-nav button { background: #1b3a6b; border: none; color: #fff; width: 32px; height: 32px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
   #gno-nav button:hover { background: #f26523; }
@@ -38,6 +72,7 @@
     <button id="gno-next" aria-label="Next">&#8594;</button>
   </div>
 </div>
+
 <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
 <script>
 (function() {
@@ -47,25 +82,43 @@
   const prevBtn = document.getElementById('gno-prev');
   const nextBtn = document.getElementById('gno-next');
   const wrapper = document.getElementById('gno-wrapper');
+  const isMobile = window.innerWidth <= 600;
+
+  function sendHeight() {
+    const h = wrapper.getBoundingClientRect().height;
+    window.parent.postMessage({ gnoCarouselHeight: Math.ceil(h) + 20 }, '*');
+    // Also try resizing via iframe attribute directly
+    try { window.frameElement.height = Math.ceil(h) + 20; } catch(e) {}
+  }
 
   fetch('https://gnoinc.org/wp-json/wp/v2/posts?per_page=12&_embed&orderby=date&order=desc')
     .then(r => r.json())
     .then(posts => {
-      if (!posts || !posts.length) { carousel.innerHTML = '<p style="color:#999;font-size:0.85rem;">No posts found.</p>'; return; }
+      if (!posts || !posts.length) {
+        carousel.innerHTML = '<p style="color:#999;font-size:0.85rem;">No posts found.</p>';
+        return;
+      }
+
       carousel.innerHTML = '';
+
       posts.forEach(post => {
         const title = post.title?.rendered || '';
         const link = post.link || '#';
         const date = post.date ? new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
         const cat = post._embedded?.['wp:term']?.[0]?.[0]?.name || '';
-        const imgSrc = post._embedded?.['wp:featuredmedia']?.[0]?.media_details?.sizes?.medium?.source_url || post._embedded?.['wp:featuredmedia']?.[0]?.source_url || null;
+        const imgSrc = post._embedded?.['wp:featuredmedia']?.[0]?.media_details?.sizes?.medium?.source_url
+          || post._embedded?.['wp:featuredmedia']?.[0]?.source_url
+          || null;
+
         const card = document.createElement('a');
         card.className = 'gno-card';
         card.href = link;
         card.target = '_top';
         card.rel = 'noopener noreferrer';
         card.innerHTML = `
-          ${imgSrc ? `<img class="gno-card-img" src="${imgSrc}" alt="${title}" loading="lazy">` : `<div class="gno-card-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="white" opacity="0.3"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>`}
+          ${imgSrc
+            ? `<img class="gno-card-img" src="${imgSrc}" alt="${title}" loading="lazy">`
+            : `<div class="gno-card-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="white" opacity="0.3"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>`}
           <div class="gno-card-body">
             ${cat ? `<div class="gno-card-cat">${cat}</div>` : ''}
             <div class="gno-card-title">${title}</div>
@@ -73,16 +126,34 @@
           </div>`;
         carousel.appendChild(card);
       });
-      const flkty = new Flickity(carousel, { cellAlign: 'left', contain: true, groupCells: true, pageDots: false, prevNextButtons: false, wrapAround: false, draggable: true });
-      const updateCounter = () => { counter.textContent = `${flkty.selectedIndex + 1} of ${flkty.slides.length}`; };
+
+      const flkty = new Flickity(carousel, {
+        cellAlign: 'left',
+        contain: true,
+        groupCells: isMobile ? false : true,
+        pageDots: false,
+        prevNextButtons: false,
+        wrapAround: false,
+        draggable: true
+      });
+
+      const updateCounter = () => {
+        counter.textContent = `${flkty.selectedIndex + 1} of ${flkty.slides.length}`;
+      };
       flkty.on('select', updateCounter);
       updateCounter();
+
       prevBtn.addEventListener('click', () => flkty.previous());
       nextBtn.addEventListener('click', () => flkty.next());
       nav.style.display = 'flex';
-      setTimeout(() => { window.parent.postMessage({ gnoCarouselHeight: Math.ceil(wrapper.getBoundingClientRect().height) + 20 }, '*'); }, 400);
+
+      // Send height after render and again after images load
+      setTimeout(sendHeight, 400);
+      setTimeout(sendHeight, 1500);
     })
-    .catch(() => { carousel.innerHTML = '<p style="color:#999;font-size:0.85rem;">Could not load updates.</p>'; });
+    .catch(() => {
+      carousel.innerHTML = '<p style="color:#999;font-size:0.85rem;">Could not load updates.</p>';
+    });
 })();
 </script>
 </body>
